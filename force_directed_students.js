@@ -52,6 +52,8 @@ var tooltip = d3.select("body").append("div")
    .attr("class", "tooltip")   
    .style("font-size","15px") 
 
+// I would have saved this json as a .json file elsewhere and linked to it, but I struggled with linking to it on my blog
+// It works fine when running on a local server
 var json = {
 "nodes":
 [
