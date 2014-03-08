@@ -67,7 +67,10 @@ path {
 <body>
   
   <div class="filter_options">
-    <input class="filter_button" id="button" type="checkbox"> Show CPI</input></div><br>
+    <input class="filter_button" 
+    		id="button" 
+    		type="checkbox"> Show CPI
+    </input></div><br>
   
  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
  <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
@@ -117,8 +120,9 @@ var tip = d3.tip()
   .style("visibility","visible")
   .offset([-20, 0])
   .html(function(d) {
-    return "Bills Enacted: " + d.enact + "<br> <span style='color:lightskyblue'>Democrats: " + d.propDem +  
-         " %</span><span style='color:red'><br>Republicans : " + d.propRep + "%</span>" ;
+    return "Bills Enacted: " + d.enact + "<br> <span style='color:lightskyblue'>
+    		Democrats: " + d.propDem + " %</span><span style='color:red'><br>
+         	Republicans : " + d.propRep + "%</span>" ;
   });
  
 var tip2 = d3.tip()
@@ -133,7 +137,8 @@ var svg = d3.select("body").append("svg")
             .attr("width", width + margin.left + margin.right-10)
             .attr("height", height + margin.top + margin.bottom+15)
           .append("g")
-            .attr("transform", "translate(" +(-10+ margin.left) + "," + margin.top + ")");
+            .attr("transform", "translate(" +(-10+ margin.left) + "," 
+            					 + margin.top + ")");
  
 // read in all the data, but no need to use it all
 d3.csv("congress/data.csv", function(error, data) {
@@ -217,7 +222,8 @@ d3.csv("congress/data.csv", function(error, data) {
       .text("$ Million Appropriations");;
  
   // ideally this would be a gradient with darker red representing more Republicans 
-  // and darker blue representing more Democrats. I haven't yet figured out how to make it a gradient.
+  // and darker blue representing more Democrats. I haven't yet figured out how to make 
+  // it a gradient.
   svg.selectAll(".bar")
       .data(data)
     .enter().append("rect")
@@ -251,7 +257,8 @@ d3.csv("congress/data.csv", function(error, data) {
       .style("stroke", "grey")
       .attr("d",line)
       .on('mouseover', tip2.show)
-      .on("mousemove", function(){return tip2.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
+      .on("mousemove", function(){return tip2.style("top", (event.pageY-10)+"px").
+      					      style("left",(event.pageX+10)+"px");})
       .on('mouseout', tip2.hide);
  
   svg.append("path")
@@ -262,7 +269,8 @@ d3.csv("congress/data.csv", function(error, data) {
       .attr("display","none")
       .attr("d",CPI)
       .on('mouseover',tip3.show)
-      .on("mousemove", function(){ return tip3.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
+      .on("mousemove", function(){ return tip3.style("top", (event.pageY-10)+"px")
+      					      .style("left",(event.pageX+10)+"px");})
       .on('mouseout', tip3.hide);
  
 // display CPI line when checkbox clicked
