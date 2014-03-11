@@ -120,9 +120,9 @@ var tip = d3.tip()
   .style("visibility","visible")
   .offset([-20, 0])
   .html(function(d) {
-    return "Bills Enacted: " + d.enact + "<br> <span style='color:lightskyblue'>
-    		Democrats: " + d.propDem + " %</span><span style='color:red'><br>
-         	Republicans : " + d.propRep + "%</span>" ;
+    return "Bills Enacted: " + d.enact + "<br> <span style='color:lightskyblue'>" 
+    		"Democrats: " + d.propDem + " %</span><span style='color:red'><br>" 
+         	"Republicans : " + d.propRep + "%</span>" ;
   });
  
 var tip2 = d3.tip()
