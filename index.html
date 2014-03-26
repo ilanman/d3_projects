@@ -23,7 +23,7 @@
       }
 
       .square {
-        opacity: 0.7;
+        opacity: 0.5;
       }
       
       .square:hover {
@@ -45,6 +45,8 @@
     <script src="http://d3js.org/colorbrewer.v1.min.js"></script>
     <script src="rand.js"></script>
 
+    <button type="button">Update</button><br>
+
   </head>
   <body>
 
@@ -59,8 +61,15 @@
           buckets = 10;
           mu = 10,
           sigma = 5;
-      
+
+      var svg = d3.select("body").append("svg")
+              .attr("width", width + margin.left + margin.right)
+              .attr("height", height + margin.top + margin.bottom)
+              .append("g")
+              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
       d3.tsv("heat.tsv",
+        
         function(d,i) {
           return {
             dim1: +d.dim1,
@@ -68,7 +77,6 @@
             value: +box_muller(mu, sigma)
           };
         },
-    
         
         function(error, data) {
 
@@ -80,12 +88,6 @@
               .domain([0, buckets - 1, maxNum])
               .range(colors);
 
-          var svg = d3.select("body").append("svg")
-              .attr("width", width + margin.left + margin.right)
-              .attr("height", height + margin.top + margin.bottom)
-              .append("g")
-              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
           var tip = d3.tip()
                       .attr('class', 'd3-tip')
                       .style("visibility","visible")
@@ -93,8 +95,8 @@
                       .html(function(d) {
                         return "Value:  <span style='color:red'>" + Math.round(d.value);
                       });
-          
-          svg.call(tip);
+                                
+          tip(svg.append("g"));
 
           var dim1Labels = svg.selectAll(".dim1Label")
               .data(dim_1)
@@ -162,7 +164,51 @@
                 .style("font-size", "14px")
                 .text("Legend");
 
-          });
+          // when user updates, change values
+          d3.select("button").on("click", function(d) { update(data); } );
+ 
+          function update(data){
+
+            d3.selectAll("class","d3-tip").remove();
+          
+            newVal = new Array(100);
+
+            for (var i =0; i < 100; i++){
+              newVal[i] = box_muller(mu,sigma);
+            }
+          
+            var tip = d3.tip()
+                      .attr('class', 'd3-tip')
+                      .style("visibility","visible")
+                      .offset([-20, 0])
+                      .html(function(d,i) {
+                        return "Value:  <span style='color:red'>" + Math.round(newVal[i]);
+                      });
+     
+            tip(svg.append("g"));
+
+            var heatMap = svg.selectAll(".dim2")
+              .data(data)
+              .enter().append("rect")
+              .attr("x", function(d) { return (d.dim2 - 1) * gridSize; })
+              .attr("y", function(d) { return (d.dim1 - 1) * gridSize; })
+              .attr("rx", 4)
+              .attr("ry", 4)
+              .attr("class", "dim2 bordered")
+              .attr("width", gridSize-2)
+              .attr("height", gridSize-2)
+              .style("fill", colors[0])
+              .attr("class", "square")
+              .on('mouseover', tip.show)
+              .on('mouseout', tip.hide);
+
+            heatMap.transition().style("fill", function(d,i) { return colorScale( newVal[i] ); });
+            
+            heatMap.append("title").text(function(d) { return newVal[i]; });
+          };
+
+        }
+      );
 
     </script>
   </body>
