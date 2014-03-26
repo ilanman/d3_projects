@@ -1,4 +1,4 @@
-This is a heatmap inspired by (this)[http://bl.ocks.org/tjdecke/5558084] Trulia recreation, with the following additions:
+This is a heatmap inspired by [this](http://bl.ocks.org/tjdecke/5558084) Trulia recreation, with the following additions:
 <ol>
 <li>This iteration uses [colorBrewer.js](https://github.com/mbostock/d3/blob/master/lib/colorbrewer/colorbrewer.js) for the color scheme</li>
 <li>Tool-tips using [d3 tool-tips](http://labratrevenge.com/d3-tip/) to show the value</li>
