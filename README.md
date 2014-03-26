@@ -1,5 +1,5 @@
 This is a heatmap inspired by [this](http://bl.ocks.org/tjdecke/5558084) Trulia recreation, with the following additions:
-<ol>
+
 <br>
 This iteration uses [colorBrewer.js](https://github.com/mbostock/d3/blob/master/lib/colorbrewer/colorbrewer.js) for the color scheme
 
