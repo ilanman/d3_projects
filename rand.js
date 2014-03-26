@@ -38,14 +38,19 @@ funcion generate_exp( lambda ){
   return ex;
 }
 
+/*
 
-funcion generate_logistic( a , m ){
+Generate a logistic distribution using inverse CDF
+
+*/
+
+funcion generate_logistic( mu, sigma ){
   
   var lgstc, u = 0;
   
   u = Math.random();
  
-  lgstc = a + m*Math.log(u/(1-u));
+  lgstc = mu + sigma*Math.log(u/(1-u));
   
   return lgstc
 }
