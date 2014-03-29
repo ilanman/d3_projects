@@ -1,9 +1,9 @@
 /*
-
+ 
 Implementation of the Box-Muller transform
-
+ 
 */
-
+ 
 function box_muller(mu, sigma) {
   
   var x, y, r, v = 0;
@@ -17,17 +17,17 @@ function box_muller(mu, sigma) {
     
   co = Math.sqrt( -2 * Math.log(r) / r);
   v = x*co;
-
+ 
   return v*sigma + mu;
 }
-
+ 
 /*
-
+ 
 Generate an exponential distribution using inverse CDF
-
+ 
 */
-
-funcion generate_exp( lambda ){
+ 
+function generate_exp( lambda ){
   
   var ex, u = 0;
   
@@ -37,14 +37,14 @@ funcion generate_exp( lambda ){
   
   return ex;
 }
-
+ 
 /*
-
+ 
 Generate a logistic distribution using inverse CDF
-
+ 
 */
-
-funcion generate_logistic( mu, sigma ){
+ 
+function generate_logistic( mu, sigma ){
   
   var lgstc, u = 0;
   
@@ -52,5 +52,5 @@ funcion generate_logistic( mu, sigma ){
  
   lgstc = mu + sigma*Math.log(u/(1-u));
   
-  return lgstc
+  return lgstc;
 }

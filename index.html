@@ -45,7 +45,9 @@
     <script src="http://d3js.org/colorbrewer.v1.min.js"></script>
     <script src="rand.js"></script>
 
-    <button type="button">Update</button><br>
+    <button type="button" id="Normal">Normal</button>
+    <button type="button" id="Logistic">Logistic</button>
+    <button type="button" id="Exponential">Exponential</button><br>
 
   </head>
   <body>
@@ -165,16 +167,26 @@
                 .text("Legend");
 
           // when user updates, change values
-          d3.select("button").on("click", function(d) { update(data); } );
+          d3.select("#Normal").on("click", function(d) { update(data, "norm"); } );
+          d3.select("#Logistic").on("click", function(d) { update(data, "logi"); } );
+          d3.select("#Exponential").on("click", function(d) { update(data, "expo"); } );
  
-          function update(data){
+          function update(data, dist){
 
             d3.selectAll("class","d3-tip").remove();
           
             newVal = new Array(100);
 
             for (var i =0; i < 100; i++){
-              newVal[i] = box_muller(mu,sigma);
+              if(dist == "norm"){
+                newVal[i] = box_muller(mu, sigma);
+              }
+              else if (dist == "logi"){
+                newVal[i] = generate_logistic(mu, sigma);
+              }
+              else if (dist == "expo"){
+                newVal[i] = generate_exp(lambda);
+              }
             }
           
             var tip = d3.tip()
