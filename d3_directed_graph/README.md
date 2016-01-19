@@ -1,1 +1,0 @@
-This is my first foray in d3. It's a force directed graph representing correlations amongst college students' vices. Thicker bands represent stronger correlations, and larger nodes represent larger proportions of student partaking in that vice. More info found on my [blog](https://ilanthedataman.squarespace.com/understanding-the-data-game/2013/9/30/messing-with-students).
