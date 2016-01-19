@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>  
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 12px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+      shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+
+}
+
+.line {
+  fill: none;
+  stroke-width: 6px;
+    stroke: #000;
+}
+
+.section {opacity: 0.3;}
+.section:hover {opacity: 1.0;}
+
+.section1 {opacity: 1.0;}
+
+</style>
+<body>
+
+<div id="menu2"><b>Facebook vs. Twitter</b><br>Select social media: <select>
+    <option value="Facebook">Facebook</option>
+    <option value="Twitter">Twitter</option></select>
+</div>
+
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+<script>
+
+    var margin = {top: 20, right: 90, bottom: 30, left: 80},
+        w = 600 - margin.left - margin.right,
+        h = 400 - margin.top - margin.bottom,
+        x = d3.time.scale().range([0, w]),
+        y = d3.scale.linear().range([h, 0]);
+        parseDate = d3.time.format("%Y").parse;
+    var color = d3.scale.category10(); 
+
+    var sections,
+        filtered,
+        transpose;
+    
+    var line = d3.svg.line()
+       .interpolate("basis")
+       .x(function(d) { return x(d.year); })
+       .y(function(d) { return y(d.stat); });
+    
+    var svg = d3.select("body").append("svg")
+        .attr("width", w + margin.left + margin.right)
+        .attr("height", h + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom")
+       svg.append("svg:g")
+        .attr("class", "x axis");
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        svg.append("svg:g")
+        .attr("class", "y axis");
+    
+    var menu2 = d3.select("#menu2 select")
+    			 .on("change", change);    
+          console.log( menu2.property("value"))
+
+d3.json("social.json",function(json){
+  sections = json
+  redraw();      
+});     
+      
+function change() {
+  console.log(menu2.property("value"))
+  d3.transition().delay(100).duration(1500).each(redraw);
+}
+
+function redraw() {
+
+    var nested = d3.nest()
+    .key(function(d) { return d.indicatorName; })
+    .map(sections)
+
+    var series = menu2.property("value");
+
+    var data = nested[series];
+
+    var keyring = d3.keys(data[0]).filter(function(key) { 
+          return (key !== "indicatorName" && key !== "year");
+      });
+
+    var transpose = keyring.map(function(name) {
+            return {
+              name: name,
+              values: data.map(function(d) {
+                return {year: parseDate(d.year), stat: +d[name]};
+              })
+            };
+        });
+
+    x.domain([
+    d3.min(transpose, function(c) { return d3.min(c.values, function(v) { return v.year; }); }),
+    d3.max(transpose, function(c) { return d3.max(c.values, function(v) { return v.year; }); })
+  ]);
+
+    y.domain([
+    d3.min(transpose, function(c) { return d3.min(c.values, function(v) { return v.stat; }); }),
+    d3.max(transpose, function(c) { return d3.max(c.values, function(v) { return v.stat; }); })
+  ]);
+
+
+    var section = svg.selectAll(".section")
+      .data(transpose);
+     
+    var sectionEnter = section.enter().append("g")
+      .attr("class", "section")
+      .attr("id", function(d) { return d.name; });
+    
+    sectionEnter.append("path")
+      .attr("class", "line")
+      .attr("d", function(d) { return line(d.values); })
+      .style("stroke", function(d) { return color(d.name); });
+
+    sectionEnter.append("text")
+     .attr("class", "names")
+     .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+     .attr("transform", function(d) { return "translate(" + x(d.value.year) + "," + y(d.value.stat) + ")"; })
+     .attr("x", 4)
+     .attr("dy", ".35em")
+     .text(function(d) { return d.name; });
+
+    var sectionUpdate = d3.transition(section);
+
+    sectionUpdate.select("path")
+      .attr("d", function(d) { return line(d.values); });
+    
+    sectionUpdate.select("text")
+       .attr("transform", function(d) { return "translate(" + x(d.values[d.values.length - 1].year) + "," + y(d.values[d.values.length - 1].stat) + ")"; });
+
+     d3.transition(svg).select(".y.axis")
+          .call(yAxis);   
+          
+      d3.transition(svg).select(".x.axis")
+            .attr("transform", "translate(0," + h + ")")
+          .call(xAxis);
+}
+</script>
+</html>

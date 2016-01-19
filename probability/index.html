@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<style>
+ 
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;  
+}
+ 
+path {
+    stroke: black;
+    stroke-width: 2;
+    fill: none;
+}
+ 
+.line {
+  fill: none;
+  stroke-width: 5px;
+  opacity: 0.5;
+}
+ 
+.line:hover {
+  opacity: 1;
+ 
+}
+ 
+div.tooltip {   
+  position: absolute;           
+  text-align: center;  
+  font-weight: bold;                     
+  height: 16px;                 
+  padding: 2px;             
+  font-size: 12px;  
+  border: 0px;      
+  border-radius: 8px;           
+  pointer-events: none;         
+}
+ 
+</style>
+ 
+<head>
+    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <script src="rand.js" charset="utf-8"></script>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+   
+    <div class="filter_options">
+        &nbsp;&nbsp;<input class="norm" id="button" type="checkbox">&nbsp;Normal</input>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;<input class="log" id="button1" type="checkbox">&nbsp;Logistic</input><br>
+        &nbsp;&nbsp;<input class="exp" id="button2" type="checkbox">&nbsp;Exponential</input>
+        &nbsp;&nbsp;<input class="pareto" id="button3" type="checkbox">&nbsp;Pareto</input><br>
+        &nbsp;&nbsp;<input class="gamma" id="button4" type="checkbox">&nbsp;Gamma</input>
+    </div>
+</head>
+ 
+<body>
+<script>
+ 
+var margin = {top: 40, right: 40, bottom: 30, left: 70},
+    w = 710 - margin.left - margin.right,
+    h = 420 - margin.top - margin.bottom;
+ 
+var n = [];
+var e = [];
+var l = [];
+var p = [];
+var g = [];
+var mu = 4.5, sigma = 0.75, lambda = 1.0, alpha = 1.0, x_m = 0.5, beta = 2.5;
+
+var x = d3.scale.linear()
+        .domain([0, 900])
+        .range([0, w]);
+ 
+var y = d3.scale.linear()
+        .domain([0, 1])
+        .range([h, 0]);
+ 
+var xAxis = d3.svg.axis()
+              .scale(x)
+              .orient("bottom");
+ 
+var yAxis = d3.svg.axis()
+              .scale(y)
+              .orient("left");
+ 
+var line = d3.svg.line()
+        .x(function(d) { return x(d[0]); })
+        .y(function(d) { return y(d[1]); });
+ 
+var div = d3.select("body").append("div")   
+    .attr("class", "tooltip")               
+    .style("opacity", 0);
+ 
+var svg = d3.select("body").append("svg")
+            .attr("width", w + margin.left + margin.right)
+            .attr("height", h + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+ 
+    svg.append("g")
+      .attr("class", "x axis")
+      .style("font-size","0.7em")
+      .style("font-family","sans-serif")      
+      .attr("transform", "translate(0," + h + ")")
+      .call(xAxis);
+ 
+    svg.append("g")
+      .attr("class", "y axis")
+      .style("font-size","0.7em")
+      .style("font-family","sans-serif")      
+      .call(yAxis);
+ 
+// Here is where the functions are called
+all_dists = create_dists(n,e,l,p,g);
+norm = all_dists[0];
+exp = all_dists[1];
+log = all_dists[2];
+pareto = all_dists[3];
+gamma = all_dists[4];
+check_dist(norm, exp, log, pareto, gamma);
+
+// Create arrays holding distributions
+function create_dists(n,e,l,p,g){
+
+    for (var i = 0; i < 9; i += 0.01) {   
+        n.push(norm_pdf(i,mu,sigma)); 
+        e.push(exp_pdf(i,lambda)); 
+        l.push(log_pdf(i,mu,sigma));
+        p.push(pareto_pdf(i,x_m,alpha));
+        g.push(gamma_pdf(i,beta,alpha+1));
+    }
+ 
+    norm = n.map(function(d,i) {
+            return[i,d];
+        });
+    exp = e.map(function(d,i) {
+            return[i,d];
+        })
+    log = l.map(function(d,i) {
+            return[i,d];
+        })
+    pareto = p.map(function(d,i) {
+            return[i,d];
+        })
+    gamma = g.map(function(d,i) {
+            return[i,d];
+        })
+
+    return [norm, exp, log, pareto, gamma];
+}
+
+function check_dist(norm,exp,log,pareto,gamma){
+
+    d3.selectAll("input").on("change", function() {
+        display = this.checked ? chart(0, norm, "show") : chart(0, norm, "hide") ;
+        });
+    d3.selectAll(".exp").on("change", function() {
+        display = this.checked ? chart(1, exp, "show") : chart(1, exp, "hide") ;
+        });
+    d3.selectAll(".log").on("change", function() {
+        display = this.checked ? chart(2, log, "show") : chart(2, log, "hide") ;
+        });
+    d3.selectAll(".pareto").on("change", function() {
+        display = this.checked ? chart(3, pareto, "show") : chart(3, pareto, "hide") ;
+        });
+    d3.selectAll(".gamma").on("change", function() {
+        display = this.checked ? chart(4, gamma, "show") : chart(4, gamma, "hide") ;
+        });
+}
+ 
+function chart(func, data, op){    
+ 
+    // add element and transition in
+    var path = svg.append('path')
+        .attr('class', 'line')
+        .attr('d', line(data[0]))        
+        .style("stroke",function() { 
+            if (op == "show") {
+                switch (func){
+                    case 0: return "red"; break;
+                    case 1: return "green"; break;
+                    case 2: return "blue"; break;
+                    case 3: return "purple"; break;
+                    case 4: return "orange"; break;
+                }   
+            }
+            else {
+                return "white";
+            }
+        })
+        .on("mouseover", function(d) {      
+            div.transition()        
+                .style("opacity", .9);      
+            div.html(function() { 
+                switch (func){
+                    case 0: return "Normal"; break;
+                    case 1: return "Exponential"; break;
+                    case 2: return "Logistic"; break;
+                    case 3: return "Pareto"; break;
+                    case 4: return "Gamma"; break;
+                }
+            })  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");            
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()      
+                .style("opacity", 0);   
+            })
+       .transition()
+         .duration(1500)
+         .attrTween('d', pathTween);
+ 
+    function pathTween() {
+        var interpolate = d3.scale.quantile()
+                .domain([0,1])
+                .range(d3.range(1, data.length + 1));
+        return function(t) {
+            return line(data.slice(0, interpolate(t)));
+        };
+    }
+}
+ 
+</script>
+</html>
